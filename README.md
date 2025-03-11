@@ -24,3 +24,9 @@ The project includes testing for various operations such as:
 1. Clone this repository to your local machine:
    ```bash
    git clone https://github.com/your-username/repository-name.git
+
+- **Contributing**
+Feel free to open issues, fork the repository, and create pull requests. Contributions are welcome!
+
+- **License**
+his project is open-source and available under the MIT License.
