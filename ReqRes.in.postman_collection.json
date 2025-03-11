@@ -1,0 +1,1191 @@
+{
+	"info": {
+		"_postman_id": "653a2329-0d1c-44b7-a176-ae4fcbd03492",
+		"name": "ReqRes.in",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42910427"
+	},
+	"item": [
+		{
+			"name": "List User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"//Validate Json Response Format",
+							"pm.test(\"Correct JSON Response\", function(){",
+							"    pm.response.to.have.status(200) //Verify Response Status Code - Expecting 200",
+							"    pm.expect(jsonData.page).to.eql(2); //Verify Page Number",
+							"    pm.expect(jsonData.per_page).to.eql(6); //Verify number of users per page",
+							"    pm.expect(jsonData.total).to.eql(12); // Verify total of users",
+							"    pm.expect(jsonData.total_pages).to.eql(2); //Verify page number",
+							"",
+							"})",
+							"",
+							"//LOOP TO CHECK USER NAME",
+							"var response = pm.response.json();",
+							"// Target name to search",
+							"var targetName = \"George\";",
+							"var found = false;",
+							"",
+							"// Loop through the \"data\" array",
+							"response.data.forEach(function(person) {",
+							"    if (person.first_name === targetName) {",
+							"        found = true;",
+							"        console.log(\"Match found:\", person);",
+							"        pm.test(\"Found user: \" + targetName, function() {",
+							"            pm.expect(person.first_name).to.eql(targetName);",
+							"        });",
+							"    }",
+							"});",
+							"",
+							"// If no match is found",
+							"if (!found) {",
+							"    console.log(\"No match found for\", targetName);",
+							"    pm.test(\"User not found\", function() {",
+							"        pm.expect(found).to.be.true;",
+							"    });",
+							"}",
+							"",
+							"//Check if Data Array Exists",
+							"pm.test(\"Users list (data) is present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"data\");",
+							"    pm.expect(jsonData.data).to.be.an(\"array\");",
+							"});",
+							"",
+							"//Verify Users Exist in the list",
+							"pm.test(\"Users list is not empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.length).to.be.above(0);",
+							"});",
+							"",
+							"//Validate Strture of a single user Object",
+							"pm.test(\"Each user has expected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.data.forEach((user) => {",
+							"        pm.expect(user).to.have.property(\"id\");",
+							"        pm.expect(user).to.have.property(\"email\");",
+							"        pm.expect(user).to.have.property(\"first_name\");",
+							"        pm.expect(user).to.have.property(\"last_name\");",
+							"        pm.expect(user).to.have.property(\"avatar\");",
+							"    });",
+							"});",
+							"//Verify Email Format",
+							"pm.test(\"Each user email is valid\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.data.forEach((user) => {",
+							"        pm.expect(user.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/users?page=2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Single User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Validade Status Code",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Get User Id to Fetch correct user",
+							"var jsonData = pm.response.json();",
+							"var userID = pm.environment.get(\"userID\");",
+							"pm.test(\"Correct User Fetched\", function () {",
+							"    pm.expect(jsonData.data.id).to.eql(userID); ",
+							"});",
+							"",
+							"//Validate JSON Format",
+							"pm.test(\"Response is Json format\"), function(){",
+							"    pm.response.to.be.json;",
+							"}",
+							"",
+							"//Check if \"Data object exists\"",
+							"pm.test(\"User data is present\", function(){",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"data\");",
+							"});",
+							"",
+							"//Validate Structure of the User Object",
+							"pm.test(\"User object has expected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.have.property(\"id\");",
+							"    pm.expect(jsonData.data).to.have.property(\"email\");",
+							"    pm.expect(jsonData.data).to.have.property(\"first_name\");",
+							"    pm.expect(jsonData.data).to.have.property(\"last_name\");",
+							"    pm.expect(jsonData.data).to.have.property(\"avatar\");",
+							"});",
+							"",
+							"//Validate User ID",
+							"pm.test(\"User ID is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.id).to.eql(userID);",
+							"});",
+							"",
+							"//Validate Email format and Avatar URL",
+							"pm.test(\"User email is valid\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);",
+							"});",
+							"pm.test(\"Avatar URL is valid\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.avatar).to.match(/^https?:\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$/);",
+							"});",
+							"",
+							"//Validade no Additional Fields",
+							"pm.test(\"User object does not have unexpected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    const expectedKeys = [\"id\", \"email\", \"first_name\", \"last_name\", \"avatar\"];",
+							"    Object.keys(jsonData.data).forEach(key => {",
+							"        pm.expect(expectedKeys).to.include(key);",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomValue = Math.floor(Math.random() * 12) + 1;",
+							"pm.environment.set(\"userID\", randomValue);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/users/{{userID}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Single user not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"//Validate Data is empty",
+							"pm.test(\"Response data is empty\", function(){",
+							"    pm.expect(pm.response.json()).to.be.empty;",
+							"})",
+							"",
+							"//Validate Response body is empty",
+							"pm.test(\"Response body is empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(0);",
+							"});",
+							"",
+							"//Validade No \"Data\" Object is present",
+							"pm.test(\"No 'data' object in response\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.not.have.property(\"data\");",
+							"});",
+							"",
+							"//Check if API doesn't return unexpected fields",
+							"pm.test(\"Response does not contain unexpected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    const allowedKeys = [];",
+							"    Object.keys(jsonData).forEach(key => {",
+							"        pm.expect(allowedKeys).to.include(key);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/users/23",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"23"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List All resources",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"//Validade JSON response Format and verify pages",
+							"pm.test(\"Correct Json response\", function () {",
+							"    pm.expect(jsonData.page).to.eql(1);",
+							"    pm.expect(jsonData.per_page).to.eql(6);",
+							"    pm.expect(jsonData.total).to.eql(12);",
+							"    pm.expect(jsonData.total_pages).to.eql(2);",
+							"    pm.expect(jsonData.data[0].id).to.eql(1);",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"//Validade Response Structure",
+							"pm.test(\"Response contains all required fields\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"page\");",
+							"    pm.expect(jsonData).to.have.property(\"per_page\");",
+							"    pm.expect(jsonData).to.have.property(\"total\");",
+							"    pm.expect(jsonData).to.have.property(\"total_pages\");",
+							"    pm.expect(jsonData).to.have.property(\"data\").that.is.an(\"array\");",
+							"",
+							"})",
+							"",
+							"//Check if a color exist",
+							"pm.test(\"Check if a color exist\", function() {",
+							"    ",
+							"    var dataArray = jsonData.data; //extract the data array",
+							"    ",
+							"    let ceruleanExists = false; //flag to find the match",
+							"",
+							"    //For Loop to find the color name.",
+							"    for(let i = 0; i < dataArray.length; i++) {",
+							"        if (dataArray[i].name === \"cerulean\"){",
+							"            ceruleanExists = true;",
+							"            break;",
+							"        }",
+							"    }",
+							"",
+							"    pm.expect(ceruleanExists).to.be.true;",
+							"});",
+							"",
+							"//Check \"Data\" isn't empty",
+							"pm.test(\"Data Array is not empty\", function(){",
+							"    pm.expect(jsonData.data.length).to.be.above(0);",
+							"})",
+							"",
+							"//Validate \"Data\" has required fields",
+							"pm.test(\"Each resource contains required field\", function (){",
+							"    jsonData.data.forEach(resource => { ",
+							"        pm.expect(resource).to.have.property(\"id\").that.is.a(\"number\");",
+							"        pm.expect(resource).to.have.property(\"name\").that.is.a(\"string\");",
+							"        pm.expect(resource).to.have.property(\"year\").that.is.a(\"number\");",
+							"        pm.expect(resource).to.have.property(\"color\").that.is.a(\"string\");",
+							"        pm.expect(resource).to.have.property(\"pantone_value\").that.is.a(\"string\")",
+							"",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/unknown",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"unknown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Single <resource>",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Validade Status Code",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Get User Id to Fetch correct user",
+							"var jsonData = pm.response.json();",
+							"var userID = pm.environment.get(\"userID\");",
+							"pm.expect(jsonData).to.have.property(\"data\");",
+							"pm.test(\"Correct User Fetched\", function () {",
+							"    pm.expect(jsonData.data.id).to.eql(userID); ",
+							"});",
+							"",
+							"//Validate JSON Format",
+							"pm.test(\"Response is Json format\", function(){",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"//Check if \"Data object exists\"",
+							"pm.test(\"User data is present\", function(){",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"data\");",
+							"});",
+							"",
+							"//Validate Structure of the User Object",
+							"pm.test(\"User object has expected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.have.property(\"id\");",
+							"    pm.expect(jsonData.data).to.have.property(\"name\");",
+							"    pm.expect(jsonData.data).to.have.property(\"year\");",
+							"    pm.expect(jsonData.data).to.have.property(\"color\");",
+							"    pm.expect(jsonData.data).to.have.property(\"pantone_value\");",
+							"});",
+							"",
+							"//Validate Pantone Color format",
+							"pm.test(\"Pantone value format is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    let pantonePattern = /^\\d{2}-\\d{4}$/; // Correct regex for Pantone value",
+							"    pm.expect(jsonData.data.pantone_value).to.match(pantonePattern); ",
+							"});",
+							"",
+							"",
+							"//Validade no Additional Fields",
+							"pm.test(\"User object does not have unexpected fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    const expectedKeys = [\"id\", \"name\", \"year\", \"color\", \"pantone_value\"];",
+							"    const actualKeys = Object.keys(jsonData.data);",
+							"",
+							"    actualKeys.forEach(key => {",
+							"        pm.expect(expectedKeys).to.include(key); ",
+							"    });",
+							"    pm.expect(actualKeys).to.have.lengthOf(expectedKeys.length);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomValue = Math.floor(Math.random() * 12) + 1;",
+							"pm.environment.set(\"userID\", randomValue);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/unknown/{{userID}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"unknown",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Single <resource> not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response data is empty\", function(){",
+							"    pm.expect(pm.response.json()).to.be.empty;",
+							"})",
+							"",
+							"pm.test(\"Response is Json format\"), function(){",
+							"    pm.response.to.be.json;",
+							"}",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/unknown/23",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"unknown",
+						"23"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Validade response Structure\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"name\");",
+							"    pm.expect(jsonData).to.have.property(\"job\");",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData).to.have.property(\"createdAt\");",
+							"})",
+							"",
+							"pm.test(\"Validade user ID\", function(){",
+							"    pm.expect(jsonData.id).to.exist;",
+							"})",
+							"",
+							"pm.test(\"Validate User Name and Job\", function () {",
+							"    var jsonData = pm.response.json(); ",
+							"    var expectedName = pm.environment.get(\"expectedName\"); ",
+							"    var expectedJob = pm.environment.get(\"expectedJob\");",
+							"    pm.expect(jsonData.name).to.eql(expectedName);",
+							"    pm.expect(jsonData.job).to.eql(expectedJob)",
+							"});",
+							"",
+							"pm.test(\"Validate Timestamp\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"createdAt\");",
+							"    // Regular expression for ISO 8601 timestamp format (YYYY-MM-DDTHH:mm:ss.sssZ)",
+							"    let timestampPattern = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/;",
+							"    // Validate 'createdAt' matches ISO 8601 format",
+							"    pm.expect(jsonData.createdAt).to.match(timestampPattern);",
+							"});",
+							"",
+							"pm.test(\"User object does not have unexpected fields\", function () {",
+							"    const expectedKeys = [\"id\", \"name\", \"job\", \"createdAt\"];",
+							"    const actualKeys = Object.keys(jsonData);",
+							"",
+							"    actualKeys.forEach(key => {",
+							"        pm.expect(expectedKeys).to.include(key); ",
+							"    });",
+							"",
+							"    pm.expect(actualKeys).to.have.lengthOf(expectedKeys.length);",
+							"});",
+							"",
+							"pm.test(\"Validate that the new user is created\", function () {",
+							"    var jsonData = pm.response.json(); // Parse response JSON",
+							"",
+							"    // Ensure the response contains an ID",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"",
+							"    // Store the user ID in an environment variable",
+							"    pm.environment.set(\"createdUserID\", jsonData.id);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"expectedName\", \"morpheus\");",
+							"pm.environment.set(\"expectedJob\", \"leader\");",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"morpheus\",\n    \"job\": \"leader\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"   pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Validade response Structure\", function(){",
+							"   pm.expect(jsonData).to.have.property(\"name\");",
+							"   pm.expect(jsonData).to.have.property(\"job\");",
+							"   pm.expect(jsonData).to.have.property(\"updatedAt\");",
+							"})",
+							"",
+							"pm.test(\"Correct name\", function(){",
+							"    pm.expect(jsonData.name).to.eql(\"morpheus\");",
+							"    pm.expect(jsonData.job).to.eql(\"zion resident\");",
+							"})",
+							"",
+							"pm.test(\"Validate Timestamp\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"updatedAt\");",
+							"    // Regular expression for ISO 8601 timestamp format (YYYY-MM-DDTHH:mm:ss.sssZ)",
+							"    let timestampPattern = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/;",
+							"    // Validate 'createdAt' matches ISO 8601 format",
+							"    pm.expect(jsonData.updatedAt).to.match(timestampPattern);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"morpheus\",\n    \"job\": \"zion resident\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users/2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"   pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Validade response Structure\", function(){",
+							"   pm.expect(jsonData).to.have.property(\"name\");",
+							"   pm.expect(jsonData).to.have.property(\"job\");",
+							"   pm.expect(jsonData).to.have.property(\"updatedAt\");",
+							"})",
+							"",
+							"pm.test(\"Correct name\", function(){",
+							"    pm.expect(jsonData.name).to.eql(\"morpheus\");",
+							"    pm.expect(jsonData.job).to.eql(\"zion resident\");",
+							"})",
+							"",
+							"pm.test(\"Validate Timestamp\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"updatedAt\");",
+							"    // Regular expression for ISO 8601 timestamp format (YYYY-MM-DDTHH:mm:ss.sssZ)",
+							"    let timestampPattern = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/;",
+							"    // Validate 'createdAt' matches ISO 8601 format",
+							"    pm.expect(jsonData.updatedAt).to.match(timestampPattern);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"morpheus\",\n    \"job\": \"zion resident\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users/2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"morpheus\",\n    \"job\": \"zion resident\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users/2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register - successful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"   pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Check for User ID\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"id\").and.to.be.a(\"number\");",
+							"    pm.expect(jsonData).to.have.property(\"token\").and.to.be.a(\"string\");",
+							"})",
+							"",
+							"pm.test(\"Ensure ID or Token are not null or undefined\", function () {",
+							"    pm.expect(jsonData.id).to.not.be.oneOf([null, undefined]);",
+							"    pm.expect(jsonData.token).to.not.be.oneOf([null,undefined]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"eve.holt@reqres.in\",\n    \"password\": \"pistol\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register - unsuccessful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"   pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Validate Error message\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"error\");",
+							"    pm.expect(jsonData.error).to.eql(\"Missing password\");",
+							"})",
+							"",
+							"pm.test(\"Ensure ID is not present\", function(){",
+							"    pm.expect(jsonData).to.not.have.property(\"id\");",
+							"})",
+							"",
+							"pm.test(\"Check for response body\",function(){",
+							"    pm.expect(pm.response.text()).to.not.be.empty;",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"sydney@fife\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Successful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"   pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Validate Token\", function(){",
+							"    pm.expect(jsonData).to.have.property(\"token\");",
+							"    pm.expect(jsonData.token).to.be.a(\"string\").that.is.not.empty;",
+							"",
+							"})",
+							"",
+							"pm.test(\"Response does not contain unexpected fields\", function () {",
+							"    const expectedKeys = [\"token\"];",
+							"    const actualKeys = Object.keys(jsonData);",
+							"",
+							"    actualKeys.forEach(key => {",
+							"        pm.expect(expectedKeys).to.include(key);",
+							"    });",
+							"    pm.expect(actualKeys).to.have.lengthOf(expectedKeys.length);",
+							"});",
+							"",
+							"pm.test(\"Response body is not empty\", function () {",
+							"    pm.expect(pm.response.text()).to.not.be.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"eve.holt@reqres.in\",\n    \"password\": \"cityslicka\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Unsuccessful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response is Json format\", function(){",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Response contains error\", function (){",
+							"    pm.expect(jsonData).to.have.property(\"error\");",
+							"    pm.expect(jsonData.error).to.eql(\"Missing password\");",
+							"})",
+							"",
+							"pm.test(\"User object does not have unexpected fields\", function () {",
+							"   var jsonData = pm.response.json();",
+							"",
+							"   const expectedKeys = [\"error\"];",
+							"   const actualKeys = Object.keys(jsonData);",
+							"",
+							"   actualKeys.forEach(key => {",
+							"       pm.expect(expectedKeys).to.include(key);",
+							"   });",
+							"   pm.expect(actualKeys).to.have.lengthOf(expectedKeys.length);",
+							"});",
+							"",
+							"pm.test(\"Response body is not empty\", function () {",
+							"   pm.expect(pm.response.text()).to.not.be.empty;",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"peter@klaven\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delayed response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON\", function(){",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Response body is not empty\", function () {",
+							"    pm.expect(pm.response.text()).to.not.be.empty;",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users?delay=3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "delay",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"",
+					"",
+					"// Exception for the delay response - as the Entire Project has the Test to be below 1 second",
+					"",
+					"pm.test(\"Response time is less than 1 second\", function () {",
+					"    const currentRequestName = pm.info.requestName;",
+					"",
+					"    //Skip the test for specific request(s)",
+					"    if (currentRequestName === \"Delayed response\"){",
+					"        console.log(\"Skipping 'Response Time is less than 1 second' test for this request.\");",
+					"        return;",
+					"    }",
+					"",
+					"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+					"});",
+					"",
+					""
+				]
+			}
+		}
+	]
+}
