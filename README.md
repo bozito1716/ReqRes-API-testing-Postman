@@ -29,4 +29,4 @@ The project includes testing for various operations such as:
 Feel free to open issues, fork the repository, and create pull requests. Contributions are welcome!
 
 - **License**
-his project is open-source and available under the MIT License.
+this project is open-source and available under the MIT License.
